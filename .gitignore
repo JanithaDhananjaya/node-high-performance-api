@@ -1,5 +1,23 @@
 node_modules
 # Keep environment variables out of version control
 .env
+.env.*
 
+# Generated Prisma files
 /src/generated/prisma
+prisma/migrations/
+
+# IDE Settings
+.idea/
+.vscode/
+
+# SonarQube
+.scannerwork/
+sonarqube_data/
+sonarqube_extensions/
+sonarqube_logs/
+
+# Logs and temp files
+*.log
+*_log.txt
+config_output.txt
