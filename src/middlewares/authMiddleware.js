@@ -2,7 +2,7 @@ import AppError from "../utils/AppError.js";
 import jwt from 'jsonwebtoken';
 import prisma from '../config/db.js';
 
-export default async (req, res, next) => {
+export const protect = async (req, res, next) => {
     try {
         let token;
 
