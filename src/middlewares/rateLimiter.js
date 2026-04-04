@@ -7,7 +7,7 @@ const limiter = rateLimit({
         sendCommand: (...args) => redisClient.sendCommand(args),
     }),
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5,
+    max: 100,
     message: {
         statusCode: 429,
         message: "Too many requests from this IP, please try again after 15 minutes.",

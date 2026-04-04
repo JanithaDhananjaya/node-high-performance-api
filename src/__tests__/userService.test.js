@@ -1,23 +1,32 @@
 import * as userService from '../services/userService.js';
 import prisma from '../config/db.js';
 import bcrypt from 'bcryptjs';
-import { jest } from '@jest/globals';
+// Removed @jest/globals import
 
-jest.mock('../config/db.js', () => ({
+vi.mock('../config/db.js', () => ({
     user: {
-        findUnique: jest.fn(),
-        create: jest.fn(),
+        findUnique: vi.fn(),
+        create: vi.fn(),
+    },
+    default: {
+        user: {
+            findUnique: vi.fn(),
+            create: vi.fn(),
+        }
     }
 }));
 
-jest.mock('bcryptjs', () => ({
-    hash: jest.fn().mockResolvedValue('hashed_password'),
+vi.mock('bcryptjs', () => ({
+    default: {
+        hash: vi.fn().mockResolvedValue('hashed_password'),
+    },
+    hash: vi.fn().mockResolvedValue('hashed_password'),
 }));
 
 describe('UserService - Signup', () => {
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('should throw an error if user already exists', async () => {

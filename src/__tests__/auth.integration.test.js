@@ -27,7 +27,7 @@ describe('Auth API Integration Test', () => {
                 name: 'Integration User', email: 'integration@test.com', password: 'password123', role: 'user'
             });
 
-        expect(res.statusCode).toEqual(201);
+        expect(res.statusCode).toBe(201);
         expect(res.body.success).toBe(true);
         expect(res.body.data.email).toBe('integration@test.com');
     });
@@ -39,7 +39,7 @@ describe('Auth API Integration Test', () => {
                 name: 'J', email: 'invalid-email', password: '123',
             });
 
-        expect(res.statusCode).toEqual(400);
+        expect(res.statusCode).toBe(400);
         expect(res.body.status).toBe('fail');
         expect(res.body.errors).toBeDefined();
     });
