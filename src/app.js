@@ -5,6 +5,7 @@ import globalErrorHandler from './middlewares/errorMiddleware.js';
 import AppError from './utils/AppError.js';
 import postRoutes from "./routes/postRoutes.js";
 import {serverAdapter} from "./config/bullBoard.js";
+import limiter from "./middlewares/rateLimiter.js";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(helmet()); // Set security HTTP headers
 app.use(express.json({limit: '10kb'})); // Body parser, reading data from body into req.body
 
 // 2. Routes
+app.use('/api', limiter);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/posts', postRoutes);
 
