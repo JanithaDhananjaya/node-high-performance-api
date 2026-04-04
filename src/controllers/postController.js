@@ -1,4 +1,5 @@
 import prisma from '../config/db.js';
+import {emailQueue} from "../queue/queue.js";
 
 export const createPost = async (req, res) => {
     try {
@@ -23,6 +24,11 @@ export const createPost = async (req, res) => {
                     select: {name: true, email: true}
                 }
             }
+        });
+
+        await emailQueue.add('send-post-notification', {
+            email: req.user.email,
+            postTitle: title,
         });
 
         res.status(201).json({success: true, data: newPost});
