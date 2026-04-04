@@ -14,8 +14,11 @@ A professional-grade backend architecture built with **Node.js (ES Modules)**, *
 | **Storage** | PostgreSQL (Dockerized) |
 | **Caching** | Redis (Dockerized) |
 | **Streaming** | Node.js Streams & `fast-csv` |
+| **Message Queue** | BullMQ & Redis |
 | **Testing** | Jest & Supertest |
 | **Validation** | Zod |
+| **Security** | Helmet.js |
+| **Quality** | SonarQube |
 
 ---
 
@@ -24,11 +27,27 @@ A professional-grade backend architecture built with **Node.js (ES Modules)**, *
 ### 1. Memory-Efficient Data Management
 Utilizes **Cursor-based Pagination** and **Node.js Streams** for large dataset exports. This approach prevents memory overflows by processing data in chunks rather than buffering entire tables into RAM—essential for horizontal scalability.
 
-### 2. High-Performance Caching (Redis)
-Implements the **Cache-Aside Pattern** for user profiles. By caching frequently accessed records in Redis with optimized TTLs, database overhead is reduced by up to 80% for read-heavy operations.
+### 2. High-Performance Caching & Queuing (Redis)
+Implements the **Cache-Aside Pattern** for user profiles and utilizes **BullMQ** for robust background job processing (e.g., asynchronous email delivery). This offloads heavy tasks from the main thread, ensuring the API remains responsive.
 
-### 3. Modern Architecture (ESM)
-Leverages native **ES Modules** (ESM) to utilize cutting-edge features like **Top-Level Await**, enabling cleaner asynchronous initializations (e.g., database/Redis connection at startup).
+### 3. Real-time Background Job Monitoring (BullBoard)
+Integrated **BullBoard** dashboard to visualize and manage background task queues in real-time. Accessible via `/admin/queues`, it provides insights into job statuses (wait, active, completed, failed).
+
+### 4. Advanced Relational Data Modeling
+Utilizes **Prisma's** relational power to manage complex data structures:
+- **Many-to-Many Relationships**: Seamlessly links `Posts` and `Categories` for flexible content tagging.
+- **One-to-Many Relationships**: Links `Users` to their respective `Posts` with automated referential integrity.
+
+### 5. Secure JWT Authentication
+Implements a robust authentication system using **JSON Web Tokens (JWT)** and **bcryptjs** for password hashing. All sensitive endpoints are protected via a custom `authMiddleware`, ensuring state-of-the-art security for user data.
+
+### 6. Enterprise-Grade Security & Monitoring
+- **Helmet.js**: Implements various HTTP headers to protect against common web vulnerabilities.
+- **SonarQube Integration**: Automated static code analysis to ensure high code quality, security standards, and maintainability.
+- **Global Error Handling**: A centralized, predictable error response system using custom `AppError` utilities.
+
+### 7. Modern Architecture (ESM)
+Leverages native **ES Modules** (ESM) to utilize cutting-edge features like **Top-Level Await**, enabling cleaner asynchronous initializations.
 
 ---
 
@@ -91,15 +110,22 @@ npm run dev
 ```bash
 # Run integration & unit tests
 npm test
+
+### 3. Static Code Analysis (SonarQube)
+Ensure your code meets quality standards:
+```bash
+# Start SonarQube scan
+npm run sonar
+```
 ```
 
 ---
 
 ## 🗺️ Roadmap
 - [ ] Implement Redis-based Rate Limiting (API Security)
-- [ ] Integration with SonarQube for Static Code Analysis
 - [ ] CI/CD pipelines with GitHub Actions
 - [ ] Migration to Vitest for faster unit testing
+- [ ] Support for file uploads via AWS S3 / Cloudinary
 
 ---
 
