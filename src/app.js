@@ -6,8 +6,14 @@ import AppError from './utils/AppError.js';
 import postRoutes from "./routes/postRoutes.js";
 import {serverAdapter} from "./config/bullBoard.js";
 import limiter from "./middlewares/rateLimiter.js";
+import cors from 'cors';
 
 const app = express();
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 
 // 1. Global Middlewares
 app.use(helmet()); // Set security HTTP headers 

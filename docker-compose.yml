@@ -27,6 +27,8 @@ services:
     container_name: node_senior_redis
     ports:
       - "6379:6379"
+    networks:
+      - cloud-network
 
   sonarqube:
     image: sonarqube:community
@@ -37,9 +39,56 @@ services:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_extensions:/opt/sonarqube/extensions
       - sonarqube_logs:/opt/sonarqube/logs
+  
+#  localstack:
+#    image: localstack/localstack:2.3.2
+#    container_name: localstack_main
+#    ports:
+#      - "4566:4566"
+#    environment:
+#      - SERVICES=s3
+#      - DEBUG=1
+#      - DOCKER_HOST=unix:///var/run/docker.sock
+#    volumes:
+#      - "./localstack:/var/lib/localstack"
+#      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  aws-mock:
+    image: localstack/localstack:2.3.2
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+    networks:
+      - cloud-network
+
+  api-service:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - AWS_ENDPOINT=http://aws-mock:4566
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_REGION=us-east-1
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      - aws-mock
+      - redis
+    networks:
+      - cloud-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   postgres_data: {}
   sonarqube_data: {}
   sonarqube_extensions: {}
   sonarqube_logs: {}
+
+networks:
+  cloud-network:
+    driver: bridge

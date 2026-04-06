@@ -17,6 +17,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1024.0",
     "@bull-board/api": "^6.20.6",
     "@bull-board/express": "^6.20.6",
     "@prisma/adapter-pg": "^7.6.0",
@@ -31,9 +32,11 @@
     "fast-csv": "^5.0.5",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
     "pg": "^8.20.0",
     "rate-limit-redis": "^4.3.1",
     "redis": "^5.11.0",
+    "winston": "^3.19.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
