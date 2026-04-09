@@ -1,6 +1,5 @@
 import * as userService from '../services/userService.js';
 import * as csv from 'fast-csv';
-import prisma from "../config/db.js";
 import redisClient from "../config/redis.js";
 
 export const getUsers = async (req, res, next) => {
@@ -20,7 +19,7 @@ export const exportUsers = async (req, res, next) => {
         const csvStreams = csv.format({headers: true});
         csvStreams.pipe(res);
 
-        const allUsers = await prisma.user.findMany();
+        const allUsers = await userService.findAllUsers();
 
         allUsers.forEach(user => {
             csvStreams.write({
@@ -50,12 +49,7 @@ export const exportUsersUsingBatch = async (req, res, next) => {
         let batchSize = 10;
 
         while (true) {
-            const users = await prisma.user.findMany({
-                take: batchSize,
-                skip: lastId ? 1 : 0,
-                cursor: lastId ? {id: lastId} : undefined,
-                orderBy: {id: 'asc'}
-            });
+            const users = await userService.getUsersBatch(batchSize, lastId);
 
             if (users.length === 0) break;
 
@@ -93,11 +87,7 @@ export const getUserProfile = async (req, res, next) => {
             });
         }
 
-        const user = await prisma.user.findUnique({
-            where: {id: userId},
-        });
-
-        if (!user) return res.status(404).json({message: 'User not found'});
+        const user = await userService.getUserById(userId);
 
         await redisClient.setEx(cacheKey, 3600, JSON.stringify(user));
 

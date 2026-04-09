@@ -1,44 +1,33 @@
-import prisma from '../config/db.js';
+import * as userRepository from '../repositories/userRepository.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import AppError from '../utils/AppError.js';
 
-const users = [
-    { id: 1, name: 'Janitha Silva', role: 'Senior Engineer' },
-    { id: 2, name: 'Amila Perera', role: 'Devops Engineer' },
-];
-
 export const findAllUsers = async () => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(users);
-        }, 500);
-    })
+    return await userRepository.findAll();
 };
 
 export const signup = async (userData) => {
     const { name, email, password, role } = userData;
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await userRepository.findByEmail(email);
 
     if (existingUser) throw new AppError('User already exists', 400);
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const newUser = await prisma.user.create({
-        data: {
-            name,
-            email,
-            password: hashedPassword,
-            role: role || 'user'
-        }
+    const newUser = await userRepository.create({
+        name,
+        email,
+        password: hashedPassword,
+        role: role || 'user'
     });
 
     return newUser;
 };
 
 export const login = async (email, password) => {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await userRepository.findByEmail(email);
 
     if (!user) throw new AppError('User not found', 404);
 
@@ -49,4 +38,14 @@ export const login = async (email, password) => {
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     return { user, token };
-}
+};
+
+export const getUserById = async (id) => {
+    const user = await userRepository.findById(id);
+    if (!user) throw new AppError('User not found', 404);
+    return user;
+};
+
+export const getUsersBatch = async (batchSize, lastId) => {
+    return await userRepository.findUsersBatch(batchSize, lastId);
+};

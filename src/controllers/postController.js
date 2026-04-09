@@ -1,35 +1,16 @@
-import prisma from '../config/db.js';
-import {emailQueue} from "../queue/queue.js";
+import * as postService from '../services/postService.js';
 
 export const createPost = async (req, res) => {
     try {
         const {title, content, categoryNames} = req.body;
         const userId = req.user.id;
 
-        const newPost = await prisma.post.create({
-            data: {
-                title,
-                content,
-                authorId: userId,
-                categories: {
-                    connectOrCreate: categoryNames.map(name => ({
-                        where: {name},
-                        create: {name}
-                    }))
-                }
-            },
-            include: {
-                categories: true,
-                author: {
-                    select: {name: true, email: true}
-                }
-            }
-        });
-
-        await emailQueue.add('send-post-notification', {
-            email: req.user.email,
-            postTitle: title,
-        });
+        const newPost = await postService.createNewPost({
+            title,
+            content,
+            authorId: userId,
+            categoryNames
+        }, req.user.email);
 
         res.status(201).json({success: true, data: newPost});
     } catch (error) {
@@ -40,14 +21,7 @@ export const createPost = async (req, res) => {
 
 export const getAllPosts = async (req, res) => {
     try {
-        const posts = await prisma.post.findMany({
-            include: {
-                author: {select: {name: true, email: true}},
-                categories: true
-            },
-            orderBy: {createdAt: 'desc'}
-        });
-
+        const posts = await postService.fetchAllPosts();
         res.status(200).json({success: true, data: posts});
     } catch (error) {
         console.error('Error fetching posts:', error);
